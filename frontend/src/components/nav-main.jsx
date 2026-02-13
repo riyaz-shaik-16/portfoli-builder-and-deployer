@@ -62,6 +62,7 @@ export function NavMain({ items }) {
                             <SidebarMenuSubButton
                               className={isActive ? "bg-muted" : ""}
                             >
+                              {subItem.icon}
                               <span>{subItem.title}</span>
                             </SidebarMenuSubButton>
                           )}

@@ -31,12 +31,14 @@ export default function DetailsForm() {
     const fetchPortfolio = async () => {
       try {
         const response = await api.get("/portfolio");
-
         const portfolio = response.data.portfolio;
 
         if (!portfolio) return;
 
         const formattedData = { ...portfolio };
+
+        // Safety check
+        if (!formattedData.data) return;
 
         // Format education dates
         formattedData.data.education?.forEach((edu) => {
@@ -60,9 +62,11 @@ export default function DetailsForm() {
           if (ach.date) ach.date = ach.date.split("T")[0];
         });
 
+        // Avatar stays as URL string — no change needed
+
         setPortfolio(formattedData);
       } catch (error) {
-        console.log("Fetch Error:", error);
+        toast.error("Something went Wrong!",{position:"top-right"})
       }
     };
 
@@ -73,31 +77,39 @@ export default function DetailsForm() {
     try {
       setPreviewLoading(true);
 
-      console.log("TEMPLATE:", template);
-      console.log("THEME:", theme);
-      console.log("DATA BEFORE CLEAN:", data);
-
       const formData = new FormData();
 
       formData.append("template", template);
       formData.append("theme", JSON.stringify(theme));
 
-      // Deep clone
       const cleanData = JSON.parse(JSON.stringify(data));
 
-      // Keep only existing URL strings, remove File objects
+      /* =============================
+       PRESERVE EXISTING IMAGE URLS
+    ============================== */
+
+      // Avatar
+      if (typeof data.personal.avatar === "string") {
+        cleanData.personal.avatar = data.personal.avatar;
+      } else {
+        delete cleanData.personal.avatar;
+      }
+
+      // Projects
       cleanData.projects?.forEach((p, index) => {
         p.images = (data.projects[index].images || []).filter(
           (img) => typeof img === "string",
         );
       });
 
+      // Certifications
       cleanData.certifications?.forEach((c, index) => {
         c.images = (data.certifications[index].images || []).filter(
           (img) => typeof img === "string",
         );
       });
 
+      // Achievements
       cleanData.achievements?.forEach((a, index) => {
         a.images = (data.achievements[index].images || []).filter(
           (img) => typeof img === "string",
@@ -106,7 +118,16 @@ export default function DetailsForm() {
 
       formData.append("data", JSON.stringify(cleanData));
 
-      // Attach project images
+      /* =============================
+       APPEND NEW FILES ONLY
+    ============================== */
+
+      // Avatar upload
+      if (data.personal.avatar instanceof File) {
+        formData.append("avatar", data.personal.avatar);
+      }
+
+      // Project images
       data.projects.forEach((project, pIndex) => {
         project.images?.forEach((img) => {
           if (img instanceof File) {
@@ -115,7 +136,7 @@ export default function DetailsForm() {
         });
       });
 
-      // Attach certification images
+      // Certification images
       data.certifications.forEach((cert, cIndex) => {
         cert.images?.forEach((img) => {
           if (img instanceof File) {
@@ -124,7 +145,7 @@ export default function DetailsForm() {
         });
       });
 
-      // Attach achievement images
+      // Achievement images
       data.achievements.forEach((ach, aIndex) => {
         ach.images?.forEach((img) => {
           if (img instanceof File) {
@@ -138,10 +159,9 @@ export default function DetailsForm() {
           "Content-Type": "multipart/form-data",
         },
       });
-
-      console.log("RESPONSE:", response.data);
+      toast.success("Saved Successfully!",{position:"top-right"})
     } catch (error) {
-      console.log("ERROR:", error);
+      toast.error("Something went wrong!",{position:"top-right"});
     } finally {
       setPreviewLoading(false);
     }
@@ -180,15 +200,18 @@ export default function DetailsForm() {
             value={data.personal.location}
             onChange={(e) => updatePersonal("location", e.target.value)}
           />
-          <Input
-            placeholder="Avatar URL"
-            value={data.personal.avatar}
-            onChange={(e) => updatePersonal("avatar", e.target.value)}
-          />
           <Textarea
             placeholder="Short Bio"
             value={data.personal.bio}
             onChange={(e) => updatePersonal("bio", e.target.value)}
+          />
+
+          <ImageUploadBox
+            images={data.personal.avatar ? [data.personal.avatar] : []}
+            max={1}
+            setImages={(imgs) =>
+              updatePersonal("avatar", imgs.length > 0 ? imgs[0] : "")
+            }
           />
         </CardContent>
       </Card>
@@ -733,7 +756,7 @@ export default function DetailsForm() {
 
       <Separator />
       <Button className="w-full" onClick={handleSubmit}>
-        {previewLoading ? "Loading" : "save Details"}
+        {previewLoading ? "Saving..." : "Save Details"}
       </Button>
     </div>
   );

@@ -73,9 +73,7 @@ export default function TemplatesPage() {
       setLoading(true);
       const {data} = await api.post("/portfolio/update-template",{template});
       toast.success("Template updated successfully!",{position:"top-right"});
-      console.log(data.template)
     } catch (error) {
-      console.log("Error: ", error);
       toast.error("Error updating theme!",{position:"top-right"});
     } finally{
       setLoading(false);

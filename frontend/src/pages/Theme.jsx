@@ -35,7 +35,6 @@ export default function Styling() {
       setLoading(true);
       const {data} = await api.post("/portfolio/update-theme",{theme});
       toast.success("Theme updated successfully!",{position:"top-right"});
-      console.log(data.theme)
     } catch (error) {
       toast.error("Error updating theme!",{position:"top-right"});
     } finally{
@@ -43,6 +42,18 @@ export default function Styling() {
     }
   }
 
+  const handleClearTheme = async()=>{
+    try {
+      setLoading(true);
+      updateTheme({ primary: "", accent: "", background: "", text: "" });
+      const {data} = await api.post("/portfolio/update-theme",{theme:{ primary: "", accent: "", background: "", text: "" }});
+      toast.success("Theme Cleared successfully!",{position:"top-right"});
+    } catch (error) {
+      toast.error("Error clearing theme!",{position:"top-right"});
+    } finally{
+      setLoading(false);
+    }
+  }
   return (
     <div className="w-full mx-auto p-6 space-y-8">
 
@@ -54,11 +65,25 @@ export default function Styling() {
           Select a palette that matches your personality.
         </p>
       </div>
-      <Button
-        onClick={handleUpdateTheme}
-      >
-        {loading ? "Updating!" : "Update Theme"}
-      </Button>
+      <div className="bg-amber-50 border border-amber-200 rounded-lg p-4 mb-6">
+        <p className="text-sm text-amber-800">
+          <span className="font-semibold">💡 Tip:</span> It's recommended to use the colors that come with templates. However, you can still customize them here if needed.
+        </p>
+      </div>
+      <div className="flex justify-between items-center">
+        <Button
+          variant="outline"
+          onClick={handleClearTheme}
+        >
+          Clear Theme
+        </Button>
+        <Button
+          onClick={handleUpdateTheme}
+          disabled={loading}
+        >
+          {loading ? "Updating..." : "Update Theme"}
+        </Button>
+      </div>
       <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
 
         {palettes.map((palette) => (

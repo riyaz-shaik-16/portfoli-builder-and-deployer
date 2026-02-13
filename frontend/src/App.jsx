@@ -8,9 +8,10 @@ import Dashboard from "./pages/Dashboard";
 import Home from "./pages/Home";
 import Details from "./pages/Details";
 import Preview from "./pages/Preview";
-import Styling from "./pages/Styling";
+import Theme from "./pages/Theme";
 import Template from "./pages/Template";
 import Builder from "./pages/Builder";
+import Deploy from "./pages/Deploy";
 
 const App = () => {
   return (
@@ -35,11 +36,14 @@ const App = () => {
           <Route element={<DashboardLayout parent="Builder" title="Details" />}>
             <Route path="/builder/details" element={<Details />} />
           </Route>
-          <Route element={<DashboardLayout parent="Builder" title="Styling" />}>
-            <Route path="/builder/styling" element={<Styling />} />
+          <Route element={<DashboardLayout parent="Builder" title="Theme" />}>
+            <Route path="/builder/theme" element={<Theme />} />
           </Route>
           <Route element={<DashboardLayout parent="Builder" title="Preview" />}>
             <Route path="/builder/preview" element={<Preview />} />
+          </Route>
+          <Route element={<DashboardLayout parent="Builder" title="Deploy" />}>
+            <Route path="/builder/deploy" element={<Deploy />} />
           </Route>
           {/* <Route path="/dashboard" element={<Dashboard />} /> */}
         </Route>

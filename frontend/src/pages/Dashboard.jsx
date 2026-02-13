@@ -18,7 +18,6 @@ export default function Dashboard() {
     const fetchDashboard = async () => {
       try {
         const res = await api.get("/dashboard/")
-        console.log(res);
         setData(res.data)
       } catch (err) {
         console.error(err)

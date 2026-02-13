@@ -19,7 +19,8 @@ import {
   RiFileListLine,
   RiPaletteLine,
   RiEyeLine,
-  RiCommandLine
+  RiCommandLine,
+  RiRocketLine
 } from "@remixicon/react"
 
 const data = {
@@ -41,8 +42,8 @@ const data = {
           icon: <RiLayoutGridLine />,
         },
         {
-          title: "Styling",
-          url: "/builder/styling",
+          title: "Theme",
+          url: "/builder/theme",
           icon: <RiPaletteLine />,
         },
         {
@@ -54,6 +55,11 @@ const data = {
           title: "Preview",
           url: "/builder/preview",
           icon: <RiEyeLine />,
+        },
+        {
+          title: "Deploy",
+          url: "/builder/deploy",
+          icon: <RiRocketLine />,
         },
       ],
     },

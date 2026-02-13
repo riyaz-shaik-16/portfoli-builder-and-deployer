@@ -62,7 +62,7 @@ export default function Dashboard() {
             <>
               <Badge variant="secondary">No Portfolio</Badge>
               <p className="text-sm text-muted-foreground">
-                You haven’t created a portfolio yet.
+                You haven't created a portfolio yet.
               </p>
               <Button>Create Portfolio</Button>
             </>
@@ -111,7 +111,13 @@ export default function Dashboard() {
 
               <div className="flex gap-3">
                 <Button variant="outline" onClick={handleEditPortfolio}>Edit Portfolio</Button>
-                <Button onClick={handleViewLive} className={`${portfolio.staus !== "live" ? "cursor-not-allowed" : null}`}>View Live</Button>
+                <Button 
+                  onClick={handleViewLive} 
+                  disabled={!portfolio.deployedUrl}
+                  className={!portfolio.deployedUrl ? "cursor-not-allowed opacity-50" : ""}
+                >
+                  View Live
+                </Button>
               </div>
             </>
           )}

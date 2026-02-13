@@ -12,12 +12,15 @@ export default function DeployPage() {
 
   const fetchDashboard = async () => {
     try {
+      setLoading(true);
       const { data } = await api.get("/dashboard/")
 
       setState(data.state)
       setPortfolio(data.portfolio)
     } catch (err) {
       toast.error("Something went wrong!",{positon:"top-right"})
+    } finally {
+      setLoading(false);
     }
   }
 
@@ -42,6 +45,15 @@ export default function DeployPage() {
   }
 
   const isLive = state === "live"
+
+  if (loading) {
+    return (
+      <div className="p-8 space-y-4">
+        <Skeleton className="h-8 w-48" />
+        <Skeleton className="h-40 w-full rounded-xl" />
+      </div>
+    )
+  }
 
   return (
     <div className="max-w-3xl mx-auto p-8">

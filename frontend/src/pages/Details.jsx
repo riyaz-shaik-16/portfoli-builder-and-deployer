@@ -11,6 +11,7 @@ import api from "@/services/api";
 import { toast } from "sonner";
 import ImageUploadBox from "@/components/ImageUploadBox";
 import { useEffect } from "react";
+import { Skeleton } from "@/components/ui/skeleton";
 
 export default function DetailsForm() {
   const {
@@ -28,6 +29,7 @@ export default function DetailsForm() {
   const [previewLoading, setPreviewLoading] = useState(false);
 
   useEffect(() => {
+    setPreviewLoading(true);
     const fetchPortfolio = async () => {
       try {
         const response = await api.get("/portfolio");
@@ -67,6 +69,8 @@ export default function DetailsForm() {
         setPortfolio(formattedData);
       } catch (error) {
         toast.error("Something went Wrong!",{position:"top-right"})
+      } finally{
+        setPreviewLoading(false);
       }
     };
 
@@ -166,6 +170,25 @@ export default function DetailsForm() {
       setPreviewLoading(false);
     }
   };
+
+
+  if (previewLoading) {
+    return (
+      <div className="space-y-6 max-w-5xl mx-auto">
+      <Card>
+        <CardHeader>
+        <Skeleton className="h-6 w-40" />
+        </CardHeader>
+        <CardContent className="space-y-4">
+        <Skeleton className="h-10 w-full" />
+        <Skeleton className="h-10 w-full" />
+        <Skeleton className="h-10 w-full" />
+        <Skeleton className="h-24 w-full" />
+        </CardContent>
+      </Card>
+      </div>
+    )
+  }
 
   return (
     <div className="space-y-6 max-w-5xl mx-auto">

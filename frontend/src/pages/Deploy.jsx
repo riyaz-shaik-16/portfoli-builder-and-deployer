@@ -29,7 +29,7 @@ export default function DeployPage() {
     try {
       setLoading(true)
 
-      await api.post("/api/portfolio/deploy")
+      await api.post("/portfolio/deploy")
 
       toast.success("Deployment Successful!",{positon:"top-right"});
 

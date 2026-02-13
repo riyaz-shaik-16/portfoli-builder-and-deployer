@@ -41,14 +41,14 @@ const data = {
           icon: <RiLayoutGridLine />,
         },
         {
-          title: "Details",
-          url: "/builder/details",
-          icon: <RiFileListLine />,
-        },
-        {
           title: "Styling",
           url: "/builder/styling",
           icon: <RiPaletteLine />,
+        },
+        {
+          title: "Details",
+          url: "/builder/details",
+          icon: <RiFileListLine />,
         },
         {
           title: "Preview",

@@ -8,11 +8,16 @@ import { Button } from "@/components/ui/button";
 import { Separator } from "@base-ui/react";
 import { useState } from "react";
 import api from "@/services/api";
-import { toast } from "sonner"
+import { toast } from "sonner";
+import ImageUploadBox from "@/components/ImageUploadBox";
+import { useEffect } from "react";
 
 export default function DetailsForm() {
   const {
+    template,
+    theme,
     data,
+    setPortfolio,
     updatePersonal,
     updateSocialLinks,
     addItem,
@@ -22,45 +27,121 @@ export default function DetailsForm() {
 
   const [previewLoading, setPreviewLoading] = useState(false);
 
+  useEffect(() => {
+    const fetchPortfolio = async () => {
+      try {
+        const response = await api.get("/portfolio");
+
+        const portfolio = response.data.portfolio;
+
+        if (!portfolio) return;
+
+        const formattedData = { ...portfolio };
+
+        // Format education dates
+        formattedData.data.education?.forEach((edu) => {
+          if (edu.startDate) edu.startDate = edu.startDate.split("T")[0];
+          if (edu.endDate) edu.endDate = edu.endDate.split("T")[0];
+        });
+
+        // Format experience dates
+        formattedData.data.experience?.forEach((exp) => {
+          if (exp.startDate) exp.startDate = exp.startDate.split("T")[0];
+          if (exp.endDate) exp.endDate = exp.endDate.split("T")[0];
+        });
+
+        // Format certification dates
+        formattedData.data.certifications?.forEach((cert) => {
+          if (cert.issueDate) cert.issueDate = cert.issueDate.split("T")[0];
+        });
+
+        // Format achievement dates
+        formattedData.data.achievements?.forEach((ach) => {
+          if (ach.date) ach.date = ach.date.split("T")[0];
+        });
+
+        setPortfolio(formattedData);
+      } catch (error) {
+        console.log("Fetch Error:", error);
+      }
+    };
+
+    fetchPortfolio();
+  }, []);
+
   const handleSubmit = async () => {
     try {
       setPreviewLoading(true);
 
-      console.log("data: ", data);
-      console.log("Clicked!!");
+      console.log("TEMPLATE:", template);
+      console.log("THEME:", theme);
+      console.log("DATA BEFORE CLEAN:", data);
 
-      const response = await api.post("/portfolio", {
-        template: "modern",
-        theme: {
-          primary: "#6366f1",
-          background: "#ffffff",
-          text: "#111827",
-          accent: "#22c55e",
-        },
-        data,
-        seo: {
-          metaTitle: "Riyaz | Full Stack Developer Portfolio",
-          metaDescription:
-            "Explore Riyaz's portfolio showcasing full-stack web development projects, skills in React, Node.js, and scalable backend systems.",
-          keywords: [
-            "Riyaz",
-            "Full Stack Developer",
-            "React Developer",
-            "Node.js Developer",
-            "JavaScript",
-            "Web Developer Portfolio",
-          ],
+      const formData = new FormData();
+
+      formData.append("template", template);
+      formData.append("theme", JSON.stringify(theme));
+
+      // Deep clone
+      const cleanData = JSON.parse(JSON.stringify(data));
+
+      // Keep only existing URL strings, remove File objects
+      cleanData.projects?.forEach((p, index) => {
+        p.images = (data.projects[index].images || []).filter(
+          (img) => typeof img === "string",
+        );
+      });
+
+      cleanData.certifications?.forEach((c, index) => {
+        c.images = (data.certifications[index].images || []).filter(
+          (img) => typeof img === "string",
+        );
+      });
+
+      cleanData.achievements?.forEach((a, index) => {
+        a.images = (data.achievements[index].images || []).filter(
+          (img) => typeof img === "string",
+        );
+      });
+
+      formData.append("data", JSON.stringify(cleanData));
+
+      // Attach project images
+      data.projects.forEach((project, pIndex) => {
+        project.images?.forEach((img) => {
+          if (img instanceof File) {
+            formData.append(`projectImages-${pIndex}`, img);
+          }
+        });
+      });
+
+      // Attach certification images
+      data.certifications.forEach((cert, cIndex) => {
+        cert.images?.forEach((img) => {
+          if (img instanceof File) {
+            formData.append(`certificationImages-${cIndex}`, img);
+          }
+        });
+      });
+
+      // Attach achievement images
+      data.achievements.forEach((ach, aIndex) => {
+        ach.images?.forEach((img) => {
+          if (img instanceof File) {
+            formData.append(`achievementImages-${aIndex}`, img);
+          }
+        });
+      });
+
+      const response = await api.post("/portfolio", formData, {
+        headers: {
+          "Content-Type": "multipart/form-data",
         },
       });
 
-      console.log("Came here!");
-
-      console.log(response);
+      console.log("RESPONSE:", response.data);
     } catch (error) {
-      // console.log(error.response?.data?.message ||
-      //     "Something went wrong");
-      toast.error(error,{position:"top-right"});
-      console.log(error);
+      console.log("ERROR:", error);
     } finally {
       setPreviewLoading(false);
     }
@@ -213,6 +294,7 @@ export default function DetailsForm() {
                   })
                 }
               />
+
               <Textarea
                 placeholder="Description"
                 value={proj.description}
@@ -223,6 +305,7 @@ export default function DetailsForm() {
                   })
                 }
               />
+
               <Input
                 placeholder="Tech Stack (comma separated)"
                 value={proj.techStack?.join(", ") || ""}
@@ -233,6 +316,7 @@ export default function DetailsForm() {
                   })
                 }
               />
+
               <Input
                 placeholder="GitHub Link"
                 value={proj.githubLink}
@@ -243,6 +327,18 @@ export default function DetailsForm() {
                   })
                 }
               />
+
+              <Input
+                placeholder="Demo Link"
+                value={proj.demoLink || ""}
+                onChange={(e) =>
+                  updateItem("projects", index, {
+                    ...proj,
+                    demoLink: e.target.value,
+                  })
+                }
+              />
+
               <Input
                 placeholder="Live Link"
                 value={proj.liveLink}
@@ -253,11 +349,37 @@ export default function DetailsForm() {
                   })
                 }
               />
+
+              <ImageUploadBox
+                images={proj.images || []}
+                max={3}
+                setImages={(imgs) =>
+                  updateItem("projects", index, {
+                    ...proj,
+                    images: imgs,
+                  })
+                }
+              />
+
+              {(proj.images?.length || 0) < 3 && (
+                <Button
+                  variant="outline"
+                  onClick={() =>
+                    updateItem("projects", index, {
+                      ...proj,
+                      images: [...(proj.images || []), ""],
+                    })
+                  }
+                >
+                  Add Image (Max 3)
+                </Button>
+              )}
+
               <Button
                 variant="destructive"
                 onClick={() => removeItem("projects", index)}
               >
-                Remove
+                Remove Project
               </Button>
             </div>
           ))}
@@ -269,7 +391,9 @@ export default function DetailsForm() {
                 description: "",
                 techStack: [],
                 githubLink: "",
+                demoLink: "",
                 liveLink: "",
+                images: [],
                 featured: false,
               })
             }
@@ -442,6 +566,7 @@ export default function DetailsForm() {
                   })
                 }
               />
+
               <Input
                 placeholder="Issuer"
                 value={cert.issuer}
@@ -452,6 +577,7 @@ export default function DetailsForm() {
                   })
                 }
               />
+
               <Input
                 type="date"
                 value={cert.issueDate || ""}
@@ -462,16 +588,19 @@ export default function DetailsForm() {
                   })
                 }
               />
-              <Input
-                placeholder="Credential URL"
-                value={cert.credentialUrl}
-                onChange={(e) =>
+
+              {/* IMAGE UPLOAD (MAX 3) */}
+              <ImageUploadBox
+                images={cert.images || []}
+                max={1}
+                setImages={(imgs) =>
                   updateItem("certifications", index, {
                     ...cert,
-                    credentialUrl: e.target.value,
+                    images: imgs,
                   })
                 }
               />
+
               <Button
                 variant="destructive"
                 onClick={() => removeItem("certifications", index)}
@@ -488,6 +617,7 @@ export default function DetailsForm() {
                 issuer: "",
                 issueDate: "",
                 credentialUrl: "",
+                images: [],
               })
             }
           >
@@ -514,6 +644,7 @@ export default function DetailsForm() {
                   })
                 }
               />
+
               <Textarea
                 placeholder="Description"
                 value={ach.description}
@@ -524,6 +655,7 @@ export default function DetailsForm() {
                   })
                 }
               />
+
               <Input
                 type="date"
                 value={ach.date || ""}
@@ -534,11 +666,23 @@ export default function DetailsForm() {
                   })
                 }
               />
+
+              <ImageUploadBox
+                images={ach.images || []}
+                max={1}
+                setImages={(imgs) =>
+                  updateItem("achievements", index, {
+                    ...ach,
+                    images: imgs,
+                  })
+                }
+              />
+
               <Button
                 variant="destructive"
                 onClick={() => removeItem("achievements", index)}
               >
-                Remove
+                Remove Achievement
               </Button>
             </div>
           ))}
@@ -549,6 +693,7 @@ export default function DetailsForm() {
                 title: "",
                 description: "",
                 date: "",
+                images: [],
               })
             }
           >

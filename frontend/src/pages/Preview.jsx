@@ -57,7 +57,7 @@ export default function PreviewPage() {
             <iframe
               srcDoc={html}
               title="Portfolio Preview"
-              className="w-full h-200 border rounded-xl"
+              className="w-full h-200 border"
             />
           )}
 

@@ -1,6 +1,7 @@
 "use client"
 
 import { useEffect, useState } from "react"
+import { useNavigate } from "react-router-dom"
 
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
@@ -9,8 +10,10 @@ import { Skeleton } from "@/components/ui/skeleton"
 import api from "@/services/api"
 
 export default function Dashboard() {
+  const router = useRouter()
   const [data, setData] = useState(null)
   const [loading, setLoading] = useState(true)
+  const navigate = useNavigate();
 
   useEffect(() => {
     const fetchDashboard = async () => {
@@ -26,6 +29,11 @@ export default function Dashboard() {
 
     fetchDashboard()
   }, [])
+
+  const handleEditPortfolio = () => navigate("/builder/details");
+  const handleViewLive = () => {
+  window.open(portfolio.deployedUrl, "_blank", "noopener,noreferrer")
+}
 
   if (loading) {
     return (
@@ -103,8 +111,8 @@ export default function Dashboard() {
               </div>
 
               <div className="flex gap-3">
-                <Button variant="outline">Edit Portfolio</Button>
-                <Button>View Live</Button>
+                <Button variant="outline" onClick={handleEditPortfolio}>Edit Portfolio</Button>
+                <Button onClick={handleViewLive} className={`${portfolio.staus !== "live" ? "cursor-not-allowed" : null}`}>View Live</Button>
               </div>
             </>
           )}

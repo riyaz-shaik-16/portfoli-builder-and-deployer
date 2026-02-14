@@ -25,7 +25,7 @@ const useAuth = () => {
     const fetchUser = async () => {
       try {
         setAuthLoading(true);
-        const res = await api.get("/auth/me");
+        const res = await api.get("/auth/profile");
         setUser(res.data);
       } catch {
         logout();

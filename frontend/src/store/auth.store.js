@@ -1,4 +1,5 @@
 import { create } from "zustand";
+import usePortfolioStore from "./portfolio.store";
 
 const useAuthStore = create((set) => ({
   user: null,
@@ -10,24 +11,25 @@ const useAuthStore = create((set) => ({
     set({
       user,
       isAuthenticated: true,
-      hasCheckedAuth: true
+      hasCheckedAuth: true,
     }),
 
-  setAuthLoading: (status) =>
-    set({ isAuthLoading: status }),
+  setAuthLoading: (status) => set({ isAuthLoading: status }),
 
-  setCheckedAuth: () =>
-    set({ hasCheckedAuth: true }),
+  setCheckedAuth: () => set({ hasCheckedAuth: true }),
 
   logout: () => {
     localStorage.removeItem("token");
+
+    // Reset portfolio state
+    usePortfolioStore.getState().resetPortfolio();
+
     set({
       user: null,
       isAuthenticated: false,
       isAuthLoading: false,
-      hasCheckedAuth: true
     });
-  }
+  },
 }));
 
 export default useAuthStore;

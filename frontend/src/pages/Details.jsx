@@ -12,6 +12,7 @@ import { toast } from "sonner";
 import ImageUploadBox from "@/components/ImageUploadBox";
 import { useEffect } from "react";
 import { Skeleton } from "@/components/ui/skeleton";
+import { Loader2 } from "lucide-react";
 
 export default function DetailsForm() {
   const {
@@ -27,13 +28,14 @@ export default function DetailsForm() {
   } = usePortfolioStore();
 
   const [previewLoading, setPreviewLoading] = useState(false);
+  const [saving, setSaving] = useState(false);
 
   useEffect(() => {
     setPreviewLoading(true);
     const fetchPortfolio = async () => {
       try {
         const response = await api.get("/portfolio");
-        const portfolio = response.data.portfolio;
+        const portfolio = response.data?.portfolio;
 
         if (!portfolio) return;
 
@@ -43,24 +45,24 @@ export default function DetailsForm() {
         if (!formattedData.data) return;
 
         // Format education dates
-        formattedData.data.education?.forEach((edu) => {
+        formattedData.data?.education?.forEach((edu) => {
           if (edu.startDate) edu.startDate = edu.startDate.split("T")[0];
           if (edu.endDate) edu.endDate = edu.endDate.split("T")[0];
         });
 
         // Format experience dates
-        formattedData.data.experience?.forEach((exp) => {
+        formattedData.data?.experience?.forEach((exp) => {
           if (exp.startDate) exp.startDate = exp.startDate.split("T")[0];
           if (exp.endDate) exp.endDate = exp.endDate.split("T")[0];
         });
 
         // Format certification dates
-        formattedData.data.certifications?.forEach((cert) => {
+        formattedData.data?.certifications?.forEach((cert) => {
           if (cert.issueDate) cert.issueDate = cert.issueDate.split("T")[0];
         });
 
         // Format achievement dates
-        formattedData.data.achievements?.forEach((ach) => {
+        formattedData.data?.achievements?.forEach((ach) => {
           if (ach.date) ach.date = ach.date.split("T")[0];
         });
 
@@ -79,7 +81,7 @@ export default function DetailsForm() {
 
   const handleSubmit = async () => {
     try {
-      setPreviewLoading(true);
+      setSaving(true);
 
       const formData = new FormData();
 
@@ -89,29 +91,29 @@ export default function DetailsForm() {
       const cleanData = JSON.parse(JSON.stringify(data));
 
       // Avatar
-      if (typeof data.personal.avatar === "string") {
-        cleanData.personal.avatar = data.personal.avatar;
+      if (typeof data?.personal?.avatar === "string") {
+        cleanData.personal.avatar = data?.personal?.avatar;
       } else {
-        delete cleanData.personal.avatar;
+        delete cleanData.personal?.avatar;
       }
 
       // Projects
       cleanData.projects?.forEach((p, index) => {
-        p.images = (data.projects[index].images || []).filter(
+        p.images = (data?.projects[index].images || []).filter(
           (img) => typeof img === "string",
         );
       });
 
       // Certifications
       cleanData.certifications?.forEach((c, index) => {
-        c.images = (data.certifications[index].images || []).filter(
+        c.images = (data?.certifications[index].images || []).filter(
           (img) => typeof img === "string",
         );
       });
 
       // Achievements
       cleanData.achievements?.forEach((a, index) => {
-        a.images = (data.achievements[index].images || []).filter(
+        a.images = (data?.achievements[index].images || []).filter(
           (img) => typeof img === "string",
         );
       });
@@ -119,12 +121,12 @@ export default function DetailsForm() {
       formData.append("data", JSON.stringify(cleanData));
 
       // Avatar upload
-      if (data.personal.avatar instanceof File) {
-        formData.append("avatar", data.personal.avatar);
+      if (data?.personal?.avatar instanceof File) {
+        formData.append("avatar", data?.personal?.avatar);
       }
 
       // Project images
-      data.projects.forEach((project, pIndex) => {
+      data?.projects.forEach((project, pIndex) => {
         project.images?.forEach((img) => {
           if (img instanceof File) {
             formData.append(`projectImages-${pIndex}`, img);
@@ -133,7 +135,7 @@ export default function DetailsForm() {
       });
 
       // Certification images
-      data.certifications.forEach((cert, cIndex) => {
+      data?.certifications.forEach((cert, cIndex) => {
         cert.images?.forEach((img) => {
           if (img instanceof File) {
             formData.append(`certificationImages-${cIndex}`, img);
@@ -142,7 +144,7 @@ export default function DetailsForm() {
       });
 
       // Achievement images
-      data.achievements.forEach((ach, aIndex) => {
+      data?.achievements.forEach((ach, aIndex) => {
         ach.images?.forEach((img) => {
           if (img instanceof File) {
             formData.append(`achievementImages-${aIndex}`, img);
@@ -157,9 +159,9 @@ export default function DetailsForm() {
       });
       toast.success("Saved Successfully!", { position: "top-right" });
     } catch (error) {
-      toast.error(error.response.data.message || "Something went wrong!", { position: "top-right" });
+      toast.error(error.response.data?.message || "Something went wrong!", { position: "top-right" });
     } finally {
-      setPreviewLoading(false);
+      setSaving(false);
     }
   };
 
@@ -223,37 +225,37 @@ export default function DetailsForm() {
         <CardContent className="space-y-4">
           <Input
             placeholder="Full Name"
-            value={data.personal.name}
+            value={data?.personal?.name}
             onChange={(e) => updatePersonal("name", e.target.value)}
           />
           <Input
             placeholder="Title"
-            value={data.personal.title}
+            value={data?.personal?.title}
             onChange={(e) => updatePersonal("title", e.target.value)}
           />
           <Input
             placeholder="Email"
-            value={data.personal.email}
+            value={data?.personal?.email}
             onChange={(e) => updatePersonal("email", e.target.value)}
           />
           <Input
             placeholder="Phone"
-            value={data.personal.phone}
+            value={data?.personal?.phone}
             onChange={(e) => updatePersonal("phone", e.target.value)}
           />
           <Input
             placeholder="Location"
-            value={data.personal.location}
+            value={data?.personal?.location}
             onChange={(e) => updatePersonal("location", e.target.value)}
           />
           <Textarea
             placeholder="Short Bio"
-            value={data.personal.bio}
+            value={data?.personal?.bio}
             onChange={(e) => updatePersonal("bio", e.target.value)}
           />
 
           <ImageUploadBox
-            images={data.personal.avatar ? [data.personal.avatar] : []}
+            images={data?.personal?.avatar ? [data?.personal?.avatar] : []}
             max={1}
             setImages={(imgs) =>
               updatePersonal("avatar", imgs.length > 0 ? imgs[0] : "")
@@ -268,7 +270,7 @@ export default function DetailsForm() {
           <CardTitle>Education</CardTitle>
         </CardHeader>
         <CardContent className="space-y-4">
-          {data.education.map((edu, index) => (
+          {data?.education.map((edu, index) => (
             <div key={index} className="space-y-3 border p-4 rounded-xl">
               <Input
                 placeholder="Institution"
@@ -351,7 +353,7 @@ export default function DetailsForm() {
           <CardTitle>Projects</CardTitle>
         </CardHeader>
         <CardContent className="space-y-4">
-          {data.projects.map((proj, index) => (
+          {data?.projects.map((proj, index) => (
             <div key={index} className="space-y-3 border p-4 rounded-xl">
               <Input
                 placeholder="Project Title"
@@ -478,7 +480,7 @@ export default function DetailsForm() {
           <CardTitle>Experience</CardTitle>
         </CardHeader>
         <CardContent className="space-y-4">
-          {data.experience.map((exp, index) => (
+          {data?.experience.map((exp, index) => (
             <div key={index} className="space-y-3 border p-4 rounded-xl">
               <Input
                 placeholder="Company"
@@ -561,7 +563,7 @@ export default function DetailsForm() {
           <CardTitle>Skills</CardTitle>
         </CardHeader>
         <CardContent className="space-y-4">
-          {data.skills.map((skill, index) => (
+          {data?.skills.map((skill, index) => (
             <div key={index} className="space-y-3 border p-4 rounded-xl">
               <Input
                 placeholder="Skill Name"
@@ -623,7 +625,7 @@ export default function DetailsForm() {
           <CardTitle>Certifications</CardTitle>
         </CardHeader>
         <CardContent className="space-y-4">
-          {data.certifications.map((cert, index) => (
+          {data?.certifications.map((cert, index) => (
             <div key={index} className="space-y-3 border p-4 rounded-xl">
               <Input
                 placeholder="Certification Name"
@@ -701,7 +703,7 @@ export default function DetailsForm() {
           <CardTitle>Achievements</CardTitle>
         </CardHeader>
         <CardContent className="space-y-4">
-          {data.achievements.map((ach, index) => (
+          {data?.achievements.map((ach, index) => (
             <div key={index} className="space-y-3 border p-4 rounded-xl">
               <Input
                 placeholder="Title"
@@ -779,22 +781,22 @@ export default function DetailsForm() {
         <CardContent className="space-y-4">
           <Input
             placeholder="GitHub URL"
-            value={data.socialLinks.github}
+            value={data?.socialLinks?.github}
             onChange={(e) => updateSocialLinks("github", e.target.value)}
           />
           <Input
             placeholder="LinkedIn URL"
-            value={data.socialLinks.linkedin}
+            value={data?.socialLinks?.linkedin}
             onChange={(e) => updateSocialLinks("linkedin", e.target.value)}
           />
           <Input
             placeholder="Twitter URL"
-            value={data.socialLinks.twitter}
+            value={data?.socialLinks?.twitter}
             onChange={(e) => updateSocialLinks("twitter", e.target.value)}
           />
           <Input
             placeholder="Personal Website"
-            value={data.socialLinks.website}
+            value={data?.socialLinks?.website}
             onChange={(e) => updateSocialLinks("website", e.target.value)}
           />
         </CardContent>
@@ -802,7 +804,7 @@ export default function DetailsForm() {
 
       <Separator />
       <Button className="w-full" onClick={handleSubmit}>
-        {previewLoading ? "Saving..." : "Save Details"}
+        {saving ? <Loader2 className="animate-spin h-8 w-8" /> : "Save Details"}
       </Button>
     </div>
   );

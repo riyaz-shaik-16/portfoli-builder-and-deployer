@@ -32,6 +32,8 @@ export function NavUser() {
   const navigate = useNavigate();
   const [accountOpen, setAccountOpen] = useState(false);
 
+  console.log("User: ", user);
+
   const handleLogout = () => {
     logout();
     navigate("/login");
@@ -49,8 +51,8 @@ export function NavUser() {
               <AvatarFallback>{user?.fullName[0]}</AvatarFallback>
             </Avatar>
             <div className="grid flex-1 text-left text-sm leading-tight">
-              <span className="truncate font-medium">{user.username}</span>
-              <span className="truncate text-xs">{user.email}</span>
+              <span className="truncate font-medium">{user?.username}</span>
+              <span className="truncate text-xs">{user?.email}</span>
             </div>
             <RiArrowUpDownLine className="ml-auto size-4" />
           </DropdownMenuTrigger>

@@ -1,11 +1,14 @@
 import { Navigate, Outlet } from "react-router-dom";
 import useAuth from "../hooks/useAuth";
+import { Skeleton } from "./ui/skeleton";
 
 const ProtectedRoute = () => {
   const { isAuthenticated, isAuthLoading } = useAuth();
 
+  console.log("came through here!");
+
   if (isAuthLoading) {
-    return <div>Loading...</div>;
+    return <Skeleton/>;
   }
 
   if (!isAuthenticated) {

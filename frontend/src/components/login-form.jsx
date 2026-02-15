@@ -35,6 +35,8 @@ export function LoginForm({ className, ...props }) {
         password
       })
 
+      console.log("Response for login: ", res.data);
+
       // store token
       localStorage.setItem("token", res.data.token)
 

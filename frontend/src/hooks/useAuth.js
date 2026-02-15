@@ -9,33 +9,27 @@ const useAuth = () => {
   const setUser = useAuthStore((s) => s.setUser);
   const setAuthLoading = useAuthStore((s) => s.setAuthLoading);
   const logout = useAuthStore((s) => s.logout);
-  const hasCheckedAuth = useAuthStore((s) => s.hasCheckedAuth);
-  const setCheckedAuth = useAuthStore((s) => s.setCheckedAuth);
 
   useEffect(() => {
-    const token = localStorage.getItem("token");
+    const initAuth = async () => {
+      const token = localStorage.getItem("token");
 
-    if (!token) {
-      setCheckedAuth();
-      return;
-    }
+      if (!token) {
+        setAuthLoading(false);
+        return;
+      }
 
-    if (isAuthenticated || isAuthLoading) return;
-
-    const fetchUser = async () => {
       try {
-        setAuthLoading(true);
-        const res = await api.get("/auth/profile");
-        setUser(res.data);
-      } catch {
+        const { data } = await api.get("/auth/profile");
+        setUser(data?.user);
+      } catch (err) {
         logout();
       } finally {
         setAuthLoading(false);
-        setCheckedAuth();
       }
     };
 
-    fetchUser();
+    initAuth();
   }, []);
 
   return { user, isAuthenticated, isAuthLoading };

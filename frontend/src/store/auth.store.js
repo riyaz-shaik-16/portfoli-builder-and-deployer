@@ -4,19 +4,18 @@ import usePortfolioStore from "./portfolio.store";
 const useAuthStore = create((set) => ({
   user: null,
   isAuthenticated: false,
-  isAuthLoading: false,
-  hasCheckedAuth: false,
+  isAuthLoading: true,
 
   setUser: (user) =>
     set({
       user,
       isAuthenticated: true,
-      hasCheckedAuth: true,
     }),
 
-  setAuthLoading: (status) => set({ isAuthLoading: status }),
-
-  setCheckedAuth: () => set({ hasCheckedAuth: true }),
+  setAuthLoading: (status) =>
+    set({
+      isAuthLoading: status,
+    }),
 
   logout: () => {
     localStorage.removeItem("token");

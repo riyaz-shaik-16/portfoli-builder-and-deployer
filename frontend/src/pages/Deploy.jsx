@@ -5,6 +5,7 @@ import { Badge } from "@/components/ui/badge"
 import api from "@/services/api"
 import { toast } from "sonner";
 import { Skeleton } from "@/components/ui/skeleton"
+import { Loader2 } from "lucide-react"
 
 export default function DeployPage() {
   const [loading, setLoading] = useState(false)
@@ -16,6 +17,7 @@ export default function DeployPage() {
     try {
       setLoading(true);
       const { data } = await api.get("/dashboard/")
+      console.log(data);
 
       setState(data.state)
       setPortfolio(data.portfolio)
@@ -34,11 +36,13 @@ export default function DeployPage() {
     try {
       setDeploying(true)
 
-      await api.post("/portfolio/deploy")
+      const {data} = await api.post("/portfolio/deploy")
+      setPortfolio(data.portfolio);
+      setState(data.state);
 
       toast.success("Deployment Successful!",{position:"top-right"});
 
-      await fetchDashboard()
+
     } catch (err) {
       toast.error("Something went wrong!",{positon:"top-right"})
     } finally {
@@ -95,7 +99,7 @@ export default function DeployPage() {
             className="w-full"
           >
             {deploying
-              ? "Deploying..."
+              ? <Loader2 className="animate-spin h-8 w-8" />
               : isLive
               ? "Redeploy"
               : "Deploy"}

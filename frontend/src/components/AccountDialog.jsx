@@ -42,7 +42,7 @@ export default function AccountDialog({ open, setOpen }) {
 
   const handleUpdate = async () => {
     try {
-      const res = await api.put("/auth/profile", form)
+      await api.put("/auth/update-profile", form)
 
       useAuthStore.setState({
         user: {

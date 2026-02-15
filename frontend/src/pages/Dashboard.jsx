@@ -58,7 +58,7 @@ export default function Dashboard() {
 
         <CardContent className="space-y-4">
 
-          {state === "empty" && (
+          {state === "new" && (
             <>
               <Badge variant="secondary">No Portfolio</Badge>
               <p className="text-sm text-muted-foreground">

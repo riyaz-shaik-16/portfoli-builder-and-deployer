@@ -10,7 +10,7 @@ import {
 } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { toast } from "sonner";
 import api from "@/services/api";
 
@@ -70,6 +70,8 @@ const templates = [
 export default function TemplatesPage() {
   const { template, setTemplate } = usePortfolioStore();
   const [loading, setLoading] = useState(false);
+
+
   const handleUpdateTemplate = async () => {
     try {
       if (!template) {
@@ -84,11 +86,28 @@ export default function TemplatesPage() {
         position: "top-right",
       });
     } catch (error) {
+      console.log("Error: ", error);
       toast.error("Error updating theme!", { position: "top-right" });
     } finally {
       setLoading(false);
     }
   };
+
+  useEffect(()=>{
+    const getTempalte = async ()=>{
+      try {
+        const {data} = await api.get("/portfolio/get-template");
+        setTemplate(data?.template);
+      } catch (error) {
+        console.log("Error: ", error);
+        toast.error("Something went wrong!",{position:"top-right"});
+      }
+    }
+
+    getTempalte();
+  },[])
+
+  console.log("Template in store: ", template);
 
   return (
     <div className="w-full mx-auto p-6 space-y-8">

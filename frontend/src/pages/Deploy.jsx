@@ -1,55 +1,55 @@
-import { useEffect, useState } from "react"
-import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { Badge } from "@/components/ui/badge"
-import api from "@/services/api"
+import { useEffect, useState } from "react";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import api from "@/services/api";
 import { toast } from "sonner";
-import { Skeleton } from "@/components/ui/skeleton"
-import { Loader2 } from "lucide-react"
+import { Skeleton } from "@/components/ui/skeleton";
+import { Loader2 } from "lucide-react";
 
 export default function DeployPage() {
-  const [loading, setLoading] = useState(false)
+  const [loading, setLoading] = useState(false);
   const [deploying, setDeploying] = useState(false);
-  const [portfolio, setPortfolio] = useState(null)
-  const [state, setState] = useState(null)
+  const [portfolio, setPortfolio] = useState(null);
+  const [state, setState] = useState(null);
 
   const fetchDashboard = async () => {
     try {
       setLoading(true);
-      const { data } = await api.get("/dashboard/")
+      const { data } = await api.get("/dashboard/");
 
-      setState(data.state)
-      setPortfolio(data.portfolio)
+      setState(data.state);
+      setPortfolio(data.portfolio);
     } catch (err) {
-      toast.error("Something went wrong!",{positon:"top-right"})
+      toast.error("Something went wrong!", { positon: "top-right" });
     } finally {
       setLoading(false);
     }
-  }
+  };
 
   useEffect(() => {
-    fetchDashboard()
-  }, [])
+    fetchDashboard();
+  }, []);
 
   const handleDeploy = async () => {
     try {
-      setDeploying(true)
+      setDeploying(true);
 
-      const {data} = await api.post("/portfolio/deploy")
+      const { data } = await api.post("/portfolio/deploy");
       setPortfolio(data.portfolio);
       setState(data.state);
 
-      toast.success("Deployment Successful!",{position:"top-right"});
-
-
+      toast.success("Deployment Successful!", { position: "top-right" });
     } catch (err) {
-      toast.error("Something went wrong!",{positon:"top-right"})
+      toast.error("Something went wrong!", { positon: "top-right" });
     } finally {
-      setDeploying(false)
+      setDeploying(false);
     }
-  }
+  };
 
-  const isLive = state === "live"
+  const isLive = state === "live";
+  const hasChanges = portfolio?.hasChanges;
+  const isDeployed = isLive && portfolio?.deployedUrl;
 
   if (loading) {
     return (
@@ -57,7 +57,7 @@ export default function DeployPage() {
         <Skeleton className="h-8 w-48" />
         <Skeleton className="h-40 w-full rounded-xl" />
       </div>
-    )
+    );
   }
 
   return (
@@ -78,7 +78,7 @@ export default function DeployPage() {
             )}
           </div>
 
-          {isLive && portfolio?.deployedUrl && (
+          {isDeployed && (
             <div className="space-y-2">
               <p className="text-sm font-medium">Live URL</p>
               <a
@@ -92,19 +92,30 @@ export default function DeployPage() {
             </div>
           )}
 
+          {isDeployed && hasChanges && (
+            <p className="text-sm text-red-500">
+              There are changes. Redeploy to see them on your live site.
+            </p>
+          )}
+
           <Button
             onClick={handleDeploy}
-            disabled={loading}
+            disabled={deploying || (isDeployed && !hasChanges)}
+            variant={isDeployed && !hasChanges ? "outline" : "default"}
             className="w-full"
           >
-            {deploying
-              ? <Loader2 className="animate-spin h-8 w-8" />
-              : isLive
-              ? "Redeploy"
-              : "Deploy"}
+            {deploying ? (
+              <Loader2 className="animate-spin h-8 w-8" />
+            ) : !isDeployed ? (
+              "Deploy"
+            ) : hasChanges ? (
+              "Redeploy"
+            ) : (
+              "Deployed"
+            )}
           </Button>
         </CardContent>
       </Card>
     </div>
-  )
+  );
 }

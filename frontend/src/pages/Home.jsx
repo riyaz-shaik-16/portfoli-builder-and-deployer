@@ -20,7 +20,7 @@ export default function LandingPage() {
 
           {/* Logo + Brand */}
           <div className="flex flex-col items-center gap-4">
-            <img src="/logo.png" alt="Craftly Logo" className="h-14 w-14" />
+            <img src="/logo.jpg" alt="Craftly Logo" className="h-14 w-14 rounded-4xl" />
             <h1 className="text-3xl font-semibold tracking-tight">
               Craftly
             </h1>

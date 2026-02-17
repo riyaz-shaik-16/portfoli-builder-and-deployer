@@ -1,8 +1,10 @@
 import { LoginForm } from "@/components/login-form";
 import { Link } from "react-router-dom";
 import { ThemeToggle } from "@/components/theme-toggle"
+import { useTheme } from "@/components/theme-provider";
 
 export default function Login() {
+  const {theme} = useTheme();
   return (
     <div className="grid min-h-svh lg:grid-cols-2">
       <div className="flex flex-col gap-4 p-6 md:p-10">
@@ -27,7 +29,7 @@ export default function Login() {
       </div>
       <div className="relative hidden lg:block">
         <img
-          src="/photo.png"
+          src={theme === "dark" ? "/dark_logo.jpg" : "/logo.jpg"}
           alt="Image"
           className="absolute inset-0 h-full w-full object-cover"
         />

@@ -86,7 +86,6 @@ export default function TemplatesPage() {
         position: "top-right",
       });
     } catch (error) {
-      console.log("Error: ", error);
       toast.error("Error updating theme!", { position: "top-right" });
     } finally {
       setLoading(false);
@@ -99,7 +98,6 @@ export default function TemplatesPage() {
         const {data} = await api.get("/portfolio/get-template");
         setTemplate(data?.template);
       } catch (error) {
-        console.log("Error: ", error);
         toast.error("Something went wrong!",{position:"top-right"});
       }
     }
@@ -107,7 +105,6 @@ export default function TemplatesPage() {
     getTempalte();
   },[])
 
-  console.log("Template in store: ", template);
 
   return (
     <div className="w-full mx-auto p-6 space-y-8">

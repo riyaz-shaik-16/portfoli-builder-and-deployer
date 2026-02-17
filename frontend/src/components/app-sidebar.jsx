@@ -72,8 +72,8 @@ export function AppSidebar({ ...props }) {
     <Sidebar variant="inset" {...props}>
       <SidebarHeader>
         <SidebarMenu>
-          <SidebarMenuItem>
-            <SidebarMenuButton size="lg" render={<a href="#" />}>
+          <SidebarMenuItem className={`flex justify-center items-center`}>
+            <SidebarMenuButton size="lg">
               <div className="text-primary-foreground flex size-10 items-center justify-center rounded-md">
                 <img
                   src="/logo.png"
@@ -84,8 +84,9 @@ export function AppSidebar({ ...props }) {
               <div className="grid flex-1 text-left text-sm leading-tight">
                 <span className="truncate font-medium">Craftly</span>
               </div>
-              <ThemeToggle/>
+              {/* <ThemeToggle/> */}
             </SidebarMenuButton>
+            <ThemeToggle/>
           </SidebarMenuItem>
         </SidebarMenu>
       </SidebarHeader>

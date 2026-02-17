@@ -32,7 +32,6 @@ export function NavUser() {
   const navigate = useNavigate();
   const [accountOpen, setAccountOpen] = useState(false);
 
-  console.log("User: ", user);
 
   const handleLogout = () => {
     logout();

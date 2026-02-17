@@ -39,7 +39,7 @@ const DashboardLayout = ({ parent, title }) => {
                 {parent && (
                   <BreadcrumbItem>
                     {title ? (
-                      <BreadcrumbLink asChild>
+                      <BreadcrumbLink>
                         <Link to={`/${parent.toLowerCase()}`}>
                           {parent}
                         </Link>

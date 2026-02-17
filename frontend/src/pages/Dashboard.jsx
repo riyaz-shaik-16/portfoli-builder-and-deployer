@@ -1,38 +1,44 @@
-"use client"
+"use client";
 
-import { useEffect, useState } from "react"
-import { useNavigate } from "react-router-dom"
+import { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card"
-import { Button } from "@/components/ui/button"
-import { Badge } from "@/components/ui/badge"
-import { Skeleton } from "@/components/ui/skeleton"
-import api from "@/services/api"
+import {
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+  CardDescription,
+} from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
+import { Skeleton } from "@/components/ui/skeleton";
+import api from "@/services/api";
 
 export default function Dashboard() {
-  const [data, setData] = useState(null)
-  const [loading, setLoading] = useState(true)
+  const [data, setData] = useState(null);
+  const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
 
   useEffect(() => {
     const fetchDashboard = async () => {
       try {
-        const res = await api.get("/dashboard/")
-        setData(res.data)
+        const res = await api.get("/dashboard/");
+        setData(res.data);
       } catch (err) {
-        console.error(err)
+        console.error(err);
       } finally {
-        setLoading(false)
+        setLoading(false);
       }
-    }
+    };
 
-    fetchDashboard()
-  }, [])
+    fetchDashboard();
+  }, []);
 
   const handleEditPortfolio = () => navigate("/builder/details");
   const handleViewLive = () => {
-  window.open(portfolio.deployedUrl, "_blank", "noopener,noreferrer")
-}
+    window.open(portfolio.deployedUrl, "_blank", "noopener,noreferrer");
+  };
 
   if (loading) {
     return (
@@ -40,24 +46,21 @@ export default function Dashboard() {
         <Skeleton className="h-8 w-48" />
         <Skeleton className="h-40 w-full rounded-xl" />
       </div>
-    )
+    );
   }
 
-  const state = data?.state
-  const portfolio = data?.portfolio
+  const state = data?.state;
+  const portfolio = data?.portfolio;
 
   return (
     <div className="p-8 space-y-6 max-w-5xl mx-auto">
       <Card className="shadow-sm border rounded-2xl">
         <CardHeader>
           <CardTitle>Portfolio Status</CardTitle>
-          <CardDescription>
-            Current state of your portfolio
-          </CardDescription>
+          <CardDescription>Current state of your portfolio</CardDescription>
         </CardHeader>
 
         <CardContent className="space-y-4">
-
           {state === "new" && (
             <>
               <Badge variant="secondary">No Portfolio</Badge>
@@ -67,13 +70,25 @@ export default function Dashboard() {
               <Button>Create Portfolio</Button>
             </>
           )}
+          {state === "empty" && (
+            <>
+              <Badge variant="secondary">Empty</Badge>
+              <p className="text-sm text-muted-foreground">
+                Your portfolio is empty. Add content to get started.
+              </p>
+              <Button onClick={handleEditPortfolio}>Add Content</Button>
+            </>
+          )}
 
           {state === "draft" && (
             <>
               <Badge variant="outline">Draft</Badge>
 
               <div className="space-y-1 text-sm">
-                <p><span className="font-medium">Template:</span> {portfolio.template}</p>
+                <p>
+                  <span className="font-medium">Template:</span>{" "}
+                  {portfolio.template}
+                </p>
                 <p className="text-muted-foreground">
                   Last Updated: {new Date(portfolio.updatedAt).toLocaleString()}
                 </p>
@@ -93,7 +108,10 @@ export default function Dashboard() {
               </Badge>
 
               <div className="space-y-1 text-sm">
-                <p><span className="font-medium">Template:</span> {portfolio.template}</p>
+                <p>
+                  <span className="font-medium">Template:</span>{" "}
+                  {portfolio.template}
+                </p>
                 <p>
                   <span className="font-medium">Live URL:</span>{" "}
                   <a
@@ -110,20 +128,25 @@ export default function Dashboard() {
               </div>
 
               <div className="flex gap-3">
-                <Button variant="outline" onClick={handleEditPortfolio}>Edit Portfolio</Button>
-                <Button 
-                  onClick={handleViewLive} 
+                <Button variant="outline" onClick={handleEditPortfolio}>
+                  Edit Portfolio
+                </Button>
+                <Button
+                  onClick={handleViewLive}
                   disabled={!portfolio.deployedUrl}
-                  className={!portfolio.deployedUrl ? "cursor-not-allowed opacity-50" : ""}
+                  className={
+                    !portfolio.deployedUrl
+                      ? "cursor-not-allowed opacity-50"
+                      : ""
+                  }
                 >
                   View Live
                 </Button>
               </div>
             </>
           )}
-
         </CardContent>
       </Card>
     </div>
-  )
+  );
 }

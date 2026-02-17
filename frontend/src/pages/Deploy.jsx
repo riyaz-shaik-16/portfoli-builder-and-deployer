@@ -17,7 +17,6 @@ export default function DeployPage() {
     try {
       setLoading(true);
       const { data } = await api.get("/dashboard/")
-      console.log(data);
 
       setState(data.state)
       setPortfolio(data.portfolio)

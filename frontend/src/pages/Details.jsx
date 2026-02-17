@@ -13,6 +13,7 @@ import ImageUploadBox from "@/components/ImageUploadBox";
 import { useEffect } from "react";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Loader2 } from "lucide-react";
+import ResumeUploadBox from "@/components/ResumeUploadBox";
 
 export default function DetailsForm() {
   const {
@@ -29,6 +30,9 @@ export default function DetailsForm() {
 
   const [previewLoading, setPreviewLoading] = useState(false);
   const [saving, setSaving] = useState(false);
+  const [resumeFile, setResumeFile] = useState(null)
+
+  
 
   useEffect(() => {
     setPreviewLoading(true);
@@ -78,6 +82,7 @@ export default function DetailsForm() {
 
     fetchPortfolio();
   }, []);
+  
 
   const handleSubmit = async () => {
     try {
@@ -85,6 +90,10 @@ export default function DetailsForm() {
 
       const formData = new FormData();
 
+      if(!template){
+        toast.warning("Select a template!",{position:"top-right"});
+        return;
+      }
       formData.append("template", template);
       formData.append("theme", JSON.stringify(theme));
 
@@ -159,7 +168,7 @@ export default function DetailsForm() {
       });
       toast.success("Saved Successfully!", { position: "top-right" });
     } catch (error) {
-      toast.error(error.response.data?.message || "Something went wrong!", { position: "top-right" });
+      toast.error(error.response?.data?.message || "Something went wrong!", { position: "top-right" });
     } finally {
       setSaving(false);
     }
@@ -191,7 +200,7 @@ export default function DetailsForm() {
 
         {/* Projects Grid */}
         <div className="grid md:grid-cols-2 gap-6">
-          {[...Array(4)].map((_, i) => (
+          {[...Array(4)]?.map((_, i) => (
             <Card key={i} className="rounded-2xl">
               <CardContent className="p-6 space-y-4">
                 <Skeleton className="h-40 w-full rounded-xl" />
@@ -217,6 +226,7 @@ export default function DetailsForm() {
 
   return (
     <div className="space-y-6 max-w-5xl mx-auto">
+      <ResumeUploadBox file={resumeFile} setFile={setResumeFile}/>
       {/* PERSONAL */}
       <Card>
         <CardHeader>
@@ -225,32 +235,32 @@ export default function DetailsForm() {
         <CardContent className="space-y-4">
           <Input
             placeholder="Full Name"
-            value={data?.personal?.name}
+            value={data?.personal?.name || ""}
             onChange={(e) => updatePersonal("name", e.target.value)}
           />
           <Input
             placeholder="Title"
-            value={data?.personal?.title}
+            value={data?.personal?.title || ""}
             onChange={(e) => updatePersonal("title", e.target.value)}
           />
           <Input
             placeholder="Email"
-            value={data?.personal?.email}
+            value={data?.personal?.email || ""}
             onChange={(e) => updatePersonal("email", e.target.value)}
           />
           <Input
             placeholder="Phone"
-            value={data?.personal?.phone}
+            value={data?.personal?.phone || ""}
             onChange={(e) => updatePersonal("phone", e.target.value)}
           />
           <Input
             placeholder="Location"
-            value={data?.personal?.location}
+            value={data?.personal?.location || ""}
             onChange={(e) => updatePersonal("location", e.target.value)}
           />
           <Textarea
             placeholder="Short Bio"
-            value={data?.personal?.bio}
+            value={data?.personal?.bio || ""}
             onChange={(e) => updatePersonal("bio", e.target.value)}
           />
 
@@ -270,11 +280,11 @@ export default function DetailsForm() {
           <CardTitle>Education</CardTitle>
         </CardHeader>
         <CardContent className="space-y-4">
-          {data?.education.map((edu, index) => (
+          {data?.education?.map((edu, index) => (
             <div key={index} className="space-y-3 border p-4 rounded-xl">
               <Input
                 placeholder="Institution"
-                value={edu.institution}
+                value={edu.institution || ""}
                 onChange={(e) =>
                   updateItem("education", index, {
                     ...edu,
@@ -284,7 +294,7 @@ export default function DetailsForm() {
               />
               <Input
                 placeholder="Degree"
-                value={edu.degree}
+                value={edu.degree || ""}
                 onChange={(e) =>
                   updateItem("education", index, {
                     ...edu,
@@ -353,11 +363,11 @@ export default function DetailsForm() {
           <CardTitle>Projects</CardTitle>
         </CardHeader>
         <CardContent className="space-y-4">
-          {data?.projects.map((proj, index) => (
+          {data?.projects?.map((proj, index) => (
             <div key={index} className="space-y-3 border p-4 rounded-xl">
               <Input
                 placeholder="Project Title"
-                value={proj.title}
+                value={proj.title || ""}
                 onChange={(e) =>
                   updateItem("projects", index, {
                     ...proj,
@@ -368,7 +378,7 @@ export default function DetailsForm() {
 
               <Textarea
                 placeholder="Description"
-                value={proj.description}
+                value={proj.description || ""}
                 onChange={(e) =>
                   updateItem("projects", index, {
                     ...proj,
@@ -383,14 +393,14 @@ export default function DetailsForm() {
                 onChange={(e) =>
                   updateItem("projects", index, {
                     ...proj,
-                    techStack: e.target.value.split(",").map((s) => s.trim()),
+                    techStack: e.target.value.split(",")?.map((s) => s.trim()),
                   })
                 }
               />
 
               <Input
                 placeholder="GitHub Link"
-                value={proj.githubLink}
+                value={proj.githubLink || ""}
                 onChange={(e) =>
                   updateItem("projects", index, {
                     ...proj,
@@ -412,7 +422,7 @@ export default function DetailsForm() {
 
               <Input
                 placeholder="Live Link"
-                value={proj.liveLink}
+                value={proj.liveLink || ""}
                 onChange={(e) =>
                   updateItem("projects", index, {
                     ...proj,
@@ -480,11 +490,11 @@ export default function DetailsForm() {
           <CardTitle>Experience</CardTitle>
         </CardHeader>
         <CardContent className="space-y-4">
-          {data?.experience.map((exp, index) => (
+          {data?.experience?.map((exp, index) => (
             <div key={index} className="space-y-3 border p-4 rounded-xl">
               <Input
                 placeholder="Company"
-                value={exp.company}
+                value={exp.company || ""}
                 onChange={(e) =>
                   updateItem("experience", index, {
                     ...exp,
@@ -494,7 +504,7 @@ export default function DetailsForm() {
               />
               <Input
                 placeholder="Role"
-                value={exp.role}
+                value={exp.role || ""}
                 onChange={(e) =>
                   updateItem("experience", index, {
                     ...exp,
@@ -563,11 +573,11 @@ export default function DetailsForm() {
           <CardTitle>Skills</CardTitle>
         </CardHeader>
         <CardContent className="space-y-4">
-          {data?.skills.map((skill, index) => (
+          {data?.skills?.map((skill, index) => (
             <div key={index} className="space-y-3 border p-4 rounded-xl">
               <Input
                 placeholder="Skill Name"
-                value={skill.name}
+                value={skill.name || ""}
                 onChange={(e) =>
                   updateItem("skills", index, {
                     ...skill,
@@ -577,7 +587,7 @@ export default function DetailsForm() {
               />
               <Input
                 placeholder="Category"
-                value={skill.category}
+                value={skill.category || ""}
                 onChange={(e) =>
                   updateItem("skills", index, {
                     ...skill,
@@ -588,7 +598,7 @@ export default function DetailsForm() {
               <Input
                 type="number"
                 placeholder="Level (1-5)"
-                value={skill.level}
+                value={skill.level || ""}
                 onChange={(e) =>
                   updateItem("skills", index, {
                     ...skill,
@@ -625,11 +635,11 @@ export default function DetailsForm() {
           <CardTitle>Certifications</CardTitle>
         </CardHeader>
         <CardContent className="space-y-4">
-          {data?.certifications.map((cert, index) => (
+          {data?.certifications?.map((cert, index) => (
             <div key={index} className="space-y-3 border p-4 rounded-xl">
               <Input
                 placeholder="Certification Name"
-                value={cert.name}
+                value={cert.name || ""}
                 onChange={(e) =>
                   updateItem("certifications", index, {
                     ...cert,
@@ -640,7 +650,7 @@ export default function DetailsForm() {
 
               <Input
                 placeholder="Issuer"
-                value={cert.issuer}
+                value={cert.issuer || ""}
                 onChange={(e) =>
                   updateItem("certifications", index, {
                     ...cert,
@@ -703,11 +713,11 @@ export default function DetailsForm() {
           <CardTitle>Achievements</CardTitle>
         </CardHeader>
         <CardContent className="space-y-4">
-          {data?.achievements.map((ach, index) => (
+          {data?.achievements?.map((ach, index) => (
             <div key={index} className="space-y-3 border p-4 rounded-xl">
               <Input
                 placeholder="Title"
-                value={ach.title}
+                value={ach.title || ""}
                 onChange={(e) =>
                   updateItem("achievements", index, {
                     ...ach,
@@ -718,7 +728,7 @@ export default function DetailsForm() {
 
               <Textarea
                 placeholder="Description"
-                value={ach.description}
+                value={ach.description || ""}
                 onChange={(e) =>
                   updateItem("achievements", index, {
                     ...ach,
@@ -781,22 +791,22 @@ export default function DetailsForm() {
         <CardContent className="space-y-4">
           <Input
             placeholder="GitHub URL"
-            value={data?.socialLinks?.github}
+            value={data?.socialLinks?.github || ""}
             onChange={(e) => updateSocialLinks("github", e.target.value)}
           />
           <Input
             placeholder="LinkedIn URL"
-            value={data?.socialLinks?.linkedin}
+            value={data?.socialLinks?.linkedin || ""}
             onChange={(e) => updateSocialLinks("linkedin", e.target.value)}
           />
           <Input
             placeholder="Twitter URL"
-            value={data?.socialLinks?.twitter}
+            value={data?.socialLinks?.twitter || ""}
             onChange={(e) => updateSocialLinks("twitter", e.target.value)}
           />
           <Input
             placeholder="Personal Website"
-            value={data?.socialLinks?.website}
+            value={data?.socialLinks?.website || ""}
             onChange={(e) => updateSocialLinks("website", e.target.value)}
           />
         </CardContent>
